@@ -12,6 +12,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private float jumpForce = 14f;
 
+    private enum MovementState { idle, runing, jumping, falling }
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -35,19 +37,32 @@ public class PlayerMovement : MonoBehaviour
 
     private void UpdateAnimationState()
     {
+        MovementState state;
+
         if (dirX > 0f)
         {
-            anim.SetBool("runing", true);
+            state = MovementState.runing;
             sprite.flipX = false;
         }
         else if (dirX < 0f)
         {
-            anim.SetBool("runing", true);
+            state = MovementState.runing;
             sprite.flipX = true;
         }
         else
         {
-            anim.SetBool("runing", false);
+            state = MovementState.idle;
         }
+
+        if(rb.velocity.y > .1f)
+        {
+            state = MovementState.jumping;
+        }
+        else if(rb.velocity.y < -.1f)
+        {
+            state = MovementState.falling;
+        }
+
+        anim.SetInteger("state", (int)state);
     }
 }
